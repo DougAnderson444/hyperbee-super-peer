@@ -27,24 +27,41 @@ app.use(cors())
  */
 const client = new HyperspaceClient()
 const corestore = client.corestore()
-const feed = corestore.get({ name: 'hyperbee-super-peer' })
-client.replicate(feed) // or feed.discoveryKey
-const db = new Hyperbee(feed, { keyEncoding: 'utf-8', valueEncoding: 'utf-8' })
+
+let feed
+let db
+
+;(async () => {
+  await corestore.ready()
+  feed = corestore.get({ name: 'hyperbee-super-peer' })
+  await feed.ready()
+  client.replicate(feed) // or feed.discoveryKey
+
+  console.log({ key: feed.key.toString('hex') })
+
+  db = new Hyperbee(feed, { keyEncoding: 'utf-8', valueEncoding: 'utf-8' })
+})()
 
 const put = async (key, value) => {
   await db.put(key, value)
   const node = await db.get(key) // null or { key, value }
   console.log(`hyperbee: ${node.key}, ${node.value}`)
+
+  db.createReadStream().on('data', ({ key, value }) => {
+    console.log(key.toString(), ': ', value.toString())
+  })
 }
 /**
   Express server routes
  */
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
+  res.sendFile(path.resolve(__dirname, 'demo/public', 'index.html'))
 })
 
 app.post('/hyperbee/add/', verifyToken, async (request, response) => {
+  console.log('posting...')
   if (request.token !== process.env.TOKEN) {
+    console.log('no match', request.token, process.env.TOKEN)
     return response.sendStatus(403)
   }
 
@@ -72,5 +89,5 @@ function verifyToken (req, res, next) {
 }
 
 const listener = app.listen(port, () => {
-  console.log(`Server is up at http://localhost:${port}`, listener.address())
+  console.log(`Server is up at http://localhost:${port}/?TOKEN=you-can-pin-to-this-hyperbee-6969`, listener.address())
 })
