@@ -1,9 +1,14 @@
 import svelte from 'rollup-plugin-svelte'
 import commonjs from '@rollup/plugin-commonjs'
-import resolve from '@rollup/plugin-node-resolve'
+import { nodeResolve } from '@rollup/plugin-node-resolve'
 import livereload from 'rollup-plugin-livereload'
 import { terser } from 'rollup-plugin-terser'
 import css from 'rollup-plugin-css-only'
+import nodePolyfills from 'rollup-plugin-node-polyfills'
+import nodeGlobals from 'rollup-plugin-node-globals'
+import builtins from 'rollup-plugin-node-builtins'
+import alias from '@rollup/plugin-alias'
+import json from '@rollup/plugin-json'
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -37,6 +42,14 @@ export default {
     file: 'public/build/bundle.js'
   },
   plugins: [
+    json(),
+    alias({
+      entries: [
+        { find: 'utils', replacement: './node_modules/util/util.js' },
+        { find: 'hyperswarm', replacement: 'hyperswarm-web' },
+        { find: 'sodium-universal', replacement: 'sodium-javascript' }
+      ]
+    }),
     svelte({
       compilerOptions: {
         // enable run-time checks when not in production
@@ -52,11 +65,16 @@ export default {
     // some cases you'll need additional configuration -
     // consult the documentation for details:
     // https://github.com/rollup/plugins/tree/master/packages/commonjs
-    resolve({
+    nodeResolve({
       browser: true,
       dedupe: ['svelte']
     }),
-    commonjs(),
+    commonjs({
+      include: [/node_modules/] // require is not defined?
+    }),
+    nodePolyfills({ buffer: true, process: true, events: true, fs: true }),
+    nodeGlobals(), // after commonjs, before builtins
+    builtins(), // builtins after commonjs
 
     // In dev mode, call `npm run start` once
     // the bundle has been generated
