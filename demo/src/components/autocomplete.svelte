@@ -88,7 +88,6 @@
 </script>
 
 <svelte:window
-  on:keydown={onKeyDown}
   on:click={() => {
     isOpen = false;
   }}

@@ -38,6 +38,7 @@ let db
   client.replicate(feed) // or feed.discoveryKey
 
   console.log({ key: feed.key.toString('hex') })
+  console.log({ Dkey: feed.discoveryKey.toString('hex') })
 
   db = new Hyperbee(feed, { keyEncoding: 'utf-8', valueEncoding: 'utf-8' })
 })()
@@ -118,5 +119,5 @@ function verifyToken (req, res, next) {
 }
 
 const listener = app.listen(port, () => {
-  console.log(`Server is up at http://localhost:${port}/?TOKEN=your-toker-goes-here`, listener.address())
+  console.log(`Server is up at http://localhost:${port}/?TOKEN=your-token-goes-here`, listener.address())
 })
