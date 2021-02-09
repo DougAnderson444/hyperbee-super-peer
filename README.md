@@ -10,7 +10,7 @@ Hyperbee is a single writer, key-value database. The idea here is if you want to
 
 ### 1. Hyperspace
 
-Start a [hyperspace](https://github.com/hypercore-protocol/hyperspace) daemon on the server
+Start a [hyperspace](https://github.com/hypercore-protocol/hyperspace) daemon on the server / on your home computer / localhost:
 
 ```
 npm i hyperspace -g
@@ -29,7 +29,7 @@ cd demo
 npm run dev
 ```
 
-If you want to restict access, place a token in your `.env` file
+If you want to restict write access, place a token in your `.env` file
 
 ```
 # .env
