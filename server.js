@@ -51,11 +51,40 @@ const put = async (key, value) => {
     console.log(key.toString(), ': ', value.toString())
   })
 }
+
+const get = async (frag) => {
+  // get the string that is char + 1 from the fragment sent
+  function getEnd (str) {
+    const len = str.length
+    if (len === 1) return String.fromCharCode(str.charCodeAt(0) + 1)
+    // increment only the last charCodeAt
+    const last = str.slice(-1)
+    const remainder = str.slice(0, -1)
+    return remainder + String.fromCharCode(last.charCodeAt(0) + 1)
+  }
+  const end = getEnd(frag)
+  console.log(`Searching ${frag} to ${end}`)
+  const results = []
+  for await (const item of db.createReadStream({ gte: frag, lt: end })) {
+    results.push(item)
+  }
+  return results
+}
 /**
   Express server routes
  */
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'demo/public', 'index.html'))
+})
+
+app.all('/hyperbee/search/:frag', async (request, response) => {
+  const frag = request.params.frag
+  console.log('searching...', frag)
+
+  const results = await get(frag)
+
+  console.log('results: ', { results })
+  response.json(results)
 })
 
 app.post('/hyperbee/add/', verifyToken, async (request, response) => {
