@@ -20,33 +20,24 @@ hyperspace
 //=> Listening on \\.\pipe\hyperspace
 ```
 
-### 2. Start the Server
+### 2. Start the Server & client side Demo
 
-Start the express server
-
-```
-cd .
-npm run start
-```
-
-### 3. Run client side Demo
-
-Run the demo 
+Start the express server & Run the demo 
 
 ```
 cd demo
 npm run dev
 ```
 
-If you want to rrestict access, place a token in your `.env` file
+If you want to restict access, place a token in your `.env` file
 
 ```
 # .env
 TOKEN=your-toker-goes-here
 ```
 
-### 4. Access client side Demo
+### 3. Open browser / Access client side Demo
 
-Goto: http://localhost:5000/?TOKEN=your-toker-goes-here
+Goto: http://localhost:12345/?TOKEN=your-toker-goes-here
 
 Will start the Svelte app with a simple form to post data to the server, which will save it to hyperbee. If you've saved a TOKEN in the .env file, you'll need to put that in the query params or else the server will gie you a 403 forbidden, as we may not want just anyone posting to our db.
