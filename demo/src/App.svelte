@@ -98,7 +98,7 @@
   <div>
     <form class="form" on:submit|preventDefault={handleSubmit}>
       <br />
-      <label for="name">Name:</label>
+      <label for="name">Key:</label>
       <input
         type="text"
         id="name"
@@ -107,7 +107,7 @@
         placeholder="Name"
       />
       <br /><br />
-      <label for="id">ID:</label>
+      <label for="id">Value:</label>
       <input
         type="text"
         id="id"
