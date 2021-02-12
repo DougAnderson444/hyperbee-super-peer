@@ -20,7 +20,9 @@
   let display = true;
   let allValues = new Map();
 
-  let key = "be8cd15d35ed0fea884631ac9161af4b2150aaf54d175c436ab4a62f236976a9"; // replace with your server key
+  const params = new URLSearchParams(window.location.search);
+  const TOKEN = params.get("TOKEN");
+  const key = params.get("KEY"); // place your key in the querystring
 
   onMount(async () => {
     mounted = true;
@@ -49,8 +51,6 @@
   /**
    * Logic to post the new data to the server side
    */
-  const params = new URLSearchParams(window.location.search);
-  const TOKEN = params.get("TOKEN");
 
   const handleSubmit = async () => {
     let dataObj = {
