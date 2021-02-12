@@ -15,8 +15,11 @@
 
   const onChange = async () => {
     isOpen = true;
-    searchResults = await searchInputHandler(search);
-    filterResults();
+    search = search.replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, "");
+    if (search) {
+      searchResults = await searchInputHandler(search);
+      filterResults();
+    }
   };
 
   const regExpEscape = (s) => {
