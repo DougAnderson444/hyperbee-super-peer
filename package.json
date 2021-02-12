@@ -1,6 +1,6 @@
 {
   "name": "hyperbee-super-peer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An express server that puts data into hyperbee",
   "main": "index.js",
   "scripts": {
