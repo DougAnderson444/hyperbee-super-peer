@@ -1,4 +1,5 @@
 /node_modules/
 /public/build/
+/public/hyperbee/build/
 
 .DS_Store

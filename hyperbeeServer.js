@@ -119,5 +119,5 @@ function verifyToken (req, res, next) {
 }
 
 const listener = app.listen(port, () => {
-  console.log(`Server is up at http://localhost:${port}/?TOKEN=your-token-goes-here`, listener.address())
+  console.log(`Server is up at http://localhost:${port}/hyperbee/?TOKEN=your-token-goes-here`, listener.address())
 })

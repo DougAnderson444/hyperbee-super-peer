@@ -39,7 +39,7 @@ export default {
     sourcemap: true,
     format: 'iife',
     name: 'app',
-    file: 'public/build/bundle.js'
+    file: 'public/hyperbee/build/bundle.js'
   },
   plugins: [
     json(),

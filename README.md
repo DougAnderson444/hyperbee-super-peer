@@ -38,6 +38,6 @@ TOKEN=your-token-goes-here
 
 ### 3. Open browser / Access client side Demo
 
-Goto: http://localhost:12345/?TOKEN=your-token-goes-here
+Goto: http://localhost:12345/hyperbee/?TOKEN=your-token-goes-here
 
 Will start the Svelte app with a simple form to post data to the server, which will save it to hyperbee. If you've saved a TOKEN in the .env file, you'll need to put that in the query params or else the server will gie you a 403 forbidden, as we may not want just anyone posting to our db.
