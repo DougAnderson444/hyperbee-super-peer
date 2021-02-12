@@ -1,6 +1,6 @@
 {
   "name": "svelte-app",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
@@ -29,7 +29,7 @@
     "corestore": "^5.8.2",
     "events": "^3.2.0",
     "hyperbee": "^1.5.3",
-    "hyperbee-svelte-component": "file:../../hyperbee-svelte-component",
+    "hyperbee-svelte-component": "0.0.3",
     "hyperswarm-web": "^2.1.1",
     "hypns-svelte-component": "^2.7.1",
     "sirv-cli": "^1.0.0"
