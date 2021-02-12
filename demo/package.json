@@ -1,10 +1,10 @@
 {
   "name": "svelte-app",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "node ../server.js"
+    "start": "node ../hyperbeeServer.js"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^3.1.2",
