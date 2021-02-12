@@ -74,7 +74,7 @@ const get = async (frag) => {
 /**
   Express server routes
  */
-app.get('/', (req, res) => {
+app.get('/hyperbee/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'demo/public', 'index.html'))
 })
 
