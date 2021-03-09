@@ -1,6 +1,6 @@
 {
-  "name": "svelte-app",
-  "version": "1.0.6",
+  "name": "hyperbee-super-peer-svelte-app-demo",
+  "version": "1.0.7",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
