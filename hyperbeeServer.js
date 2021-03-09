@@ -12,38 +12,71 @@ const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 12345
 
+app.use(bodyParser.json())
+app.use(express.static('public'))
+app.use(cors())
 /**
   Hyperspace
  */
 const HyperspaceClient = require('@hyperspace/client')
 const Hyperbee = require('hyperbee')
 
-app.use(bodyParser.json())
-app.use(express.static('public'))
-app.use(cors())
-
 /**
   Hyperspace client setup
  */
-const client = new HyperspaceClient()
-const corestore = client.corestore()
-
 let feed
 let db
+/**
+ * Reconnect login in case (when) Hyperspace reboots
+ */
+async function reconnect () {
+  // wait until the server is ready
+  await HyperspaceClient.serverReady({})
 
-;(async () => {
-  await corestore.ready()
-  feed = corestore.get({ name: 'hyperbee-super-peer' })
-  await feed.ready()
+  const client = new HyperspaceClient()
+
+  // wait for client to be ready
+  await client.ready()
+
+  const corestore = client.corestore()
+
+  const checkingStatus = setInterval(checkStatus, 5000)
+
+  async function checkStatus () {
+    try {
+      await client.status()
+    } catch (error) {
+      // no rpc, try again in a minute?
+      console.error(error, '\n\n No RPC to hyperspace, waiting until the server is back\n\n')
+      clearInterval(checkingStatus)
+      reconnect()
+      // return false
+    }
+  }
+
+  try {
+    await corestore.ready()
+    feed = corestore.get({ name: 'hyperbee-super-peer' })
+    await feed.ready()
+  } catch (error) {
+    console.error('Start hyperspace from the cli first')
+    process.exit()
+  }
+
   client.replicate(feed) // or feed.discoveryKey
 
   console.log({ key: feed.key.toString('hex') })
-  console.log({ Dkey: feed.discoveryKey.toString('hex') })
+  console.log({ DiscoveryKey: feed.discoveryKey.toString('hex') })
 
   db = new Hyperbee(feed, { keyEncoding: 'utf-8', valueEncoding: 'utf-8' })
-})()
+}
+
+// initiate reconnect cycles
+reconnect()
 
 const put = async (key, value) => {
+  key = key.replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, '').toLowerCase()
+  value = value.replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, '').toLowerCase()
   await db.put(key, value)
   const node = await db.get(key) // null or { key, value }
   console.log(`hyperbee: ${node.key}, ${node.value}`)
