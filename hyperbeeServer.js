@@ -11,6 +11,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 12345
+const INTERVAL_MSECONDS = 5000
 
 app.use(bodyParser.json())
 app.use(express.static('public'))
@@ -32,6 +33,7 @@ let db
 async function reconnect () {
   // wait until the server is ready
   await HyperspaceClient.serverReady({})
+  console.error((new Date()).toISOString(), ' - Hyperspace ready \n')
 
   const client = new HyperspaceClient()
 
@@ -40,14 +42,14 @@ async function reconnect () {
 
   const corestore = client.corestore()
 
-  const checkingStatus = setInterval(checkStatus, 5000)
+  const checkingStatus = setInterval(checkStatus, INTERVAL_MSECONDS)
 
   async function checkStatus () {
     try {
       await client.status()
     } catch (error) {
       // no rpc, try again in a minute?
-      console.error(error, '\n\n No RPC to hyperspace, waiting until the server is back\n\n')
+      console.error((new Date()).toISOString(), ' - No RPC to hyperspace, waiting until the server is back')
       clearInterval(checkingStatus)
       reconnect()
       // return false
@@ -65,9 +67,7 @@ async function reconnect () {
 
   client.replicate(feed) // or feed.discoveryKey
 
-  console.log({ key: feed.key.toString('hex') })
-  console.log({ DiscoveryKey: feed.discoveryKey.toString('hex') })
-
+  console.log(`key: ${feed.key.toString('hex')}`)
   db = new Hyperbee(feed, { keyEncoding: 'utf-8', valueEncoding: 'utf-8' })
 }
 
