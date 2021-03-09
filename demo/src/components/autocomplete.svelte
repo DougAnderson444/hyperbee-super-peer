@@ -27,6 +27,7 @@
   };
 
   function filterResults() {
+    if (!searchResults) return;
     results = searchResults
       .filter((item) => {
         if (typeof item !== "string") {
