@@ -22,13 +22,14 @@
 
   const params = new URLSearchParams(window.location.search);
   const TOKEN = params.get("TOKEN");
-  const key = params.get("KEY"); // place your key in the querystring
+  const HYPERBEE_KEY = params.get("KEY"); // place your key in the querystring
 
   onMount(async () => {
     mounted = true;
   });
 
   const handleSubmit = async () => {
+    if (!name || !id) return;
     let dataObj = {
       name,
       id,
@@ -38,7 +39,8 @@
     id = "";
   };
 
-  async function postData(url = "", data = {}) {
+  async function postData(url, data = {}) {
+    if (!url || !data) return;
     const response = await fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       headers: {
@@ -51,6 +53,7 @@
   }
 
   const readStream = async () => {
+    if (!db) return;
     db.createReadStream().on("data", ({ key, value }) => {
       allValues.set(key.toString(), value.toString());
       allValues = allValues;
@@ -58,8 +61,8 @@
   };
 
   const streamListener = () => {
+    if (!feed) return;
     feed.createReadStream({ live: true }).on("data", (d) => {
-      console.log("new data");
       readStream();
     });
   };
@@ -74,11 +77,13 @@
   $: mounted && $hypnsNode ? open() : null;
 
   const open = async () => {
-    const f = $hypnsNode.store.get({ key });
+    if (!HYPERBEE_KEY) return;
+
+    const f = $hypnsNode.store.get({ key: HYPERBEE_KEY });
     await f.ready();
     feed = f;
     feed.on("peer-open", (peer) => {
-      console.log("peer open");
+      // console.log("peer open");
     });
     $hypnsNode.swarmNetworker.configure(feed.discoveryKey, {
       announce: true,
@@ -89,16 +94,20 @@
 
   const searchInputHandler = async (search) => {
     search = search.replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, "");
+    if (!search) return false;
     return await postData(`/hyperbee/search/${search}`, {});
   };
 
   const onChange = async () => {
-    name = name
-      .replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, "")
-      .toLowerCase();
-    id = id
-      .replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, "")
-      .toLowerCase();
+    if (name)
+      name = name
+        .replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, "")
+        .toLowerCase();
+
+    if (id)
+      id = id
+        .replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, "")
+        .toLowerCase();
   };
 </script>
 
@@ -128,7 +137,7 @@
         placeholder="Value"
       />
       <br /><br />
-      <button class="raised"> Save </button>
+      <button class="raised" disabled={!name || !id}> Save </button>
     </form>
   </div>
   <HyPNSManager />
