@@ -75,8 +75,10 @@ async function reconnect () {
 reconnect()
 
 const put = async (key, value) => {
+  if (!key || !value) return
   key = key.replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, '').toLowerCase()
   value = value.replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, '').toLowerCase()
+  if (!key || !value) return
   await db.put(key, value)
   const node = await db.get(key) // null or { key, value }
   console.log(`hyperbee: ${node.key}, ${node.value}`)
@@ -86,7 +88,7 @@ const put = async (key, value) => {
   })
 }
 
-const get = async (frag) => {
+const getRange = async (frag) => {
   // get the string that is char + 1 from the fragment sent
   function getEnd (str) {
     const len = str.length
@@ -113,9 +115,10 @@ app.get('/hyperbee/', (req, res) => {
 
 app.all('/hyperbee/search/:frag', async (request, response) => {
   const frag = request.params.frag
+  if (!frag) return
   console.log('searching...', frag)
 
-  const results = await get(frag)
+  const results = await getRange(frag)
 
   console.log('results: ', { results })
   response.json(results)
@@ -152,5 +155,5 @@ function verifyToken (req, res, next) {
 }
 
 const listener = app.listen(port, () => {
-  console.log(`Server is up at http://localhost:${port}/hyperbee/?TOKEN=your-token-goes-here`, listener.address())
+  console.log(`Server is up at http://localhost:${port}/hyperbee/?TOKEN=${process.env.TOKEN}&KEY=${process.env.KEY}`, listener.address())
 })
