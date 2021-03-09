@@ -28,30 +28,6 @@
     mounted = true;
   });
 
-  $: mounted && $hypnsNode ? open() : null;
-
-  const open = async () => {
-    const f = $hypnsNode.store.get({ key });
-    await f.ready();
-    feed = f;
-
-    feed.on("peer-open", (peer) => {
-      console.log("peer open");
-    });
-    feed.createReadStream({ live: true }).on("data", (d) => {
-      readStream();
-    });
-    $hypnsNode.swarmNetworker.configure(feed.discoveryKey, {
-      announce: true,
-      lookup: true,
-      live: true,
-    });
-  };
-
-  /**
-   * Logic to post the new data to the server side
-   */
-
   const handleSubmit = async () => {
     let dataObj = {
       name,
@@ -74,21 +50,55 @@
     return await response.json(); // parses JSON response into native JavaScript objects
   }
 
-  $: feed && db && typeof db.createReadStream === "function"
-    ? readStream()
-    : null;
-
   const readStream = async () => {
-    const readStream = db.createReadStream();
-    readStream.on("data", ({ key, value }) => {
+    db.createReadStream().on("data", ({ key, value }) => {
       allValues.set(key.toString(), value.toString());
       allValues = allValues;
+    });
+  };
+
+  const streamListener = () => {
+    feed.createReadStream({ live: true }).on("data", (d) => {
+      console.log("new data");
+      readStream();
+    });
+  };
+
+  const init = () => {
+    readStream();
+    streamListener();
+  };
+
+  $: feed && db && typeof db.createReadStream === "function" ? init() : null;
+
+  $: mounted && $hypnsNode ? open() : null;
+
+  const open = async () => {
+    const f = $hypnsNode.store.get({ key });
+    await f.ready();
+    feed = f;
+    feed.on("peer-open", (peer) => {
+      console.log("peer open");
+    });
+    $hypnsNode.swarmNetworker.configure(feed.discoveryKey, {
+      announce: true,
+      lookup: true,
+      live: true,
     });
   };
 
   const searchInputHandler = async (search) => {
     search = search.replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, "");
     return await postData(`/hyperbee/search/${search}`, {});
+  };
+
+  const onChange = async () => {
+    name = name
+      .replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, "")
+      .toLowerCase();
+    id = id
+      .replace(/[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi, "")
+      .toLowerCase();
   };
 </script>
 
@@ -104,6 +114,7 @@
         id="name"
         name="name"
         bind:value={name}
+        on:input={onChange}
         placeholder="Name"
       />
       <br /><br />
@@ -113,6 +124,7 @@
         id="id"
         name="id"
         bind:value={id}
+        on:input={onChange}
         placeholder="Value"
       />
       <br /><br />
